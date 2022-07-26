@@ -125,62 +125,89 @@ class BST:
                 else:
                     cur.right = BSTNode(value)
 
-    def findTrue(self, value, node):
-        if node is None:
-            return -1
-        elif node.value > value:
-            return self.findTrue(value, node.left)
-        elif node.value < value:
-            return self.findTrue(value, node.right)
-        else:
-            return True
+    def find_node(self, value):
+        parent = None
+        cur = self._root
+        while(cur is not None):
+            if cur.value == value:
+                return True
+            
 
+    def remove(self, value: object) -> bool:
 
-    def remove(self, value: object, cur: object = None) -> bool:
-
-        if self._root is None:
-            return False
-
-        if cur == None:
-            cur = self._root
-
-        if self.findTrue(value, self._root) == -1:
-            return False
-
-        # Find the node in the left subtree	if value is less than self._root value
-        if cur.value > value:
-            cur.left = self.remove(value, cur.left)
-
-        # Find the node in right subtree if value is greater than cur value,
-        elif cur.value < value:
-            cur.right = self.remove(value, cur.right)
-
-        # Delete the node if cur.value == value
-        else:
-            # If there is no right children delete the node and new cur would be cur.left
-            if not cur.right:
-                return cur.left
-            # If there is no left children delete the node and new cur would be cur.right
-            elif not cur.left:
-                return cur.right
-            # If both left and right children exist in the node replace its value with
-            # the minmimum value in the right subtree. 
-            parent = cur.right
-            #find inorder successor
-            while parent.left:
-                parent = parent.left
-            #Trying to get rid of the root node.
-            if self._root.value == value:
-                parent.left = self._root.left
-                parent.right = self._root.right
-                self._root = parent
-                return self._root
+        # iterate through tree in search of value
+        left_bool = False
+        node_found = False
+        parent = None
+        to_remove = self.root
+        while to_remove is not None and not node_found:
+            if value == to_remove.value:
+                node_found = True
+              
+            elif value < to_remove.value:
+                parent = to_remove
+                to_remove = to_remove.left
+                left_bool = True
+              
             else:
-                cur.value = parent.value
-            # Delete the minimum node in right subtree
-                cur.right = self.remove(parent.value, cur.right)
-        return cur
-
+                parent = to_remove
+                to_remove = to_remove.right
+                left_bool = False
+        
+        # handle case where value was not found in BST
+        if not node_found:
+            return False
+        
+        # handle case where node to remove is root
+        if to_remove == self.root:
+            self.remove_first()
+            return True
+        
+        # handle case where to_remove is a leaf
+        if self.is_leaf(to_remove) and left_bool:
+            parent.left = None
+            return True
+        if self.is_leaf(to_remove) and not left_bool:
+              parent.right = None
+        return True
+        
+        # handle case where to_remove only has left subtree
+        if to_remove.right is None and left_bool:
+            parent.left = to_remove.left
+            return True
+        if to_remove.right is None and not left_bool:
+            parent.right = to_remove.left
+            return True
+        
+        # handle case where to_remove has a right subtree
+        # find left-most child from right subtree
+        left_bool_2 = False
+        replace_node = to_remove.right
+        replace_parent = to_remove
+      
+        while replace_node.left is not None:
+            replace_parent = replace_node
+            replace_node = replace_node.left
+            left_bool_2 = True
+        
+        # fill open slot from removing new_to_remove
+        if left_bool_2:
+            replace_parent.left = replace_node.right
+        if not left_bool_2:
+            replace_parent.right = replace_node.right
+        
+        # insert left-most child from right subtree in open spot
+        if left_bool:
+            parent.left = replace_node
+            replace_node.left = to_remove.left
+            replace_node.right = to_remove.right
+            return True
+        if not left_bool:
+            parent.right = replace_node
+            replace_node.left = to_remove.left
+            replace_node.right = to_remove.right
+            return True
+          
         # if self._root == None:
         #     return False
         # else:
@@ -272,10 +299,25 @@ class BST:
 
     def contains(self, value: object) -> bool:
 
-        if self.findTrue(value, self._root) == -1:
-            return False
-        else:
-            return True
+        
+        if self._root is None:
+          return False
+
+        bst_stack = Stack()
+        bst_stack.append(self._root)
+
+        while(len(bst_stack)):
+            node = bst_stack[0]
+            if node.value == value:
+                return True
+            bst_stack.pop(0)
+
+            if  node.right is not None:
+                bst_stack.append(node.right)
+            if  node.left is not None:
+                bst_stack.append(node.left)
+
+        return False
 
     def inorder_traversal(self) -> Queue:
         """
