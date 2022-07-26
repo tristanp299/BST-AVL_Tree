@@ -105,17 +105,143 @@ class BST:
 
     # ------------------------------------------------------------------ #
 
-    def add(self, value: object) -> None:
-        """
-        TODO: Write your implementation
-        """
-        pass
+    def add(self, value: object, cur = None) -> None:
 
-    def remove(self, value: object) -> bool:
-        """
-        TODO: Write your implementation
-        """
-        pass
+        if self._root is None:
+            self._root = BSTNode(value)
+
+        else:
+            if cur == None:
+                cur = self._root
+
+            if value < cur.value:
+                if cur.left is not None:
+                    self.add(value, cur.left)
+                else:
+                    cur.left = BSTNode(value)
+            elif value > cur.value:
+                if cur.right is not None:
+                    self.add(value, cur.right)
+                else:
+                    cur.right = BSTNode(value)
+
+    def findTrue(self, value, node):
+        if node is None:
+            return -1
+        elif node.value > value:
+            return self.findTrue(value, node.left)
+        elif node.value < value:
+            return self.findTrue(value, node.right)
+        else:
+            return True
+
+
+    def remove(self, value: object, cur: object = None) -> bool:
+
+        if self._root is None:
+            return False
+
+        if cur == None:
+            cur = self._root
+
+        if self.findTrue(value, self._root) == -1:
+            return False
+
+        # Find the node in the left subtree	if value is less than self._root value
+        if cur.value > value:
+            cur.left = self.remove(value, cur.left)
+
+        # Find the node in right subtree if value is greater than cur value,
+        elif cur.value < value:
+            cur.right = self.remove(value, cur.right)
+
+        # Delete the node if cur.value == value
+        else:
+            # If there is no right children delete the node and new cur would be cur.left
+            if not cur.right:
+                return cur.left
+            # If there is no left children delete the node and new cur would be cur.right
+            elif not cur.left:
+                return cur.right
+            # If both left and right children exist in the node replace its value with
+            # the minmimum value in the right subtree. Now delete that minimum node
+            # in the right subtree
+            parent = cur.right
+            #find inorder successor
+            while parent.left:
+                parent = parent.left
+            #Trying to get rid of the root node.
+            if self._root.value == value:
+                parent.left = self._root.left
+                parent.right = self._root.right
+                self._root = parent
+                return self._root
+            else:
+                cur.value = parent.value
+            # Delete the minimum node in right subtree
+                cur.right = self.remove(parent.value, cur.right)
+        return cur
+
+        # if self._root == None:
+        #     return False
+        # else:
+        #     if cur == None:
+        #         cur = self._root
+
+        #     if value == self._root.value:
+        #        if cur.left is None and cur.right is None:
+        #            self._root = None
+        #            return True
+        #        elif cur.left is None:
+        #            self._root = cur.right
+        #            return True
+        #        elif cur.right is None:
+        #            self._root = cur.left
+        #            return True
+        #
+        #     elif value == cur.value:
+        #         if cur.left is None and cur.right is None:
+        #             cur = None
+        #             return True
+        #         elif cur.left is None:
+        #             parent = cur.right
+        #             return True
+        #         elif cur.right is None:
+        #             parent = cur.left
+        #             return True
+        #
+        #         else:
+        #             while(cur.left is not None):
+        #                 cur = cur.left
+        #             parent = cur
+        #             cur.right = self.remove(value, cur.right, parent)
+        #
+        #     elif value< cur.value:
+        #         parent = cur
+        #         cur.left = self.remove(value, cur.left, parent)
+        #     else:
+        #         parent = cur
+        #         cur.right = self.remove(value, cur.right, parent)
+        # return False
+
+
+
+
+        # elif self._root.value == value:
+        #     if self._root.right is None and self._root.left is None:
+        #         self._root = None
+        #         return True
+        #     elif self._root.right is None and self._root.left is not None:
+        #         self._root = self._root.left
+        #         return True
+        #     elif self._root.right is not None and self._root.left is None:
+        #         self._root = self._root.right
+        #         return True
+        #     else:
+        #         self._root = self._root.right
+        #         return True
+
+
 
     # Consider implementing methods that handle different removal scenarios; #
     # you may find that you're able to use some of them in the AVL.          #
@@ -146,10 +272,11 @@ class BST:
         pass
 
     def contains(self, value: object) -> bool:
-        """
-        TODO: Write your implementation
-        """
-        pass
+
+        if self.findTrue(value, self._root) == -1:
+            return False
+        else:
+            return True
 
     def inorder_traversal(self) -> Queue:
         """
@@ -280,7 +407,7 @@ if __name__ == '__main__':
         if not tree.is_valid_bst():
             raise Exception("PROBLEM WITH REMOVE OPERATION")
         print('RESULT :', tree)
-
+else:
     print("\nPDF - method contains() example 1")
     print("---------------------------------")
     tree = BST([10, 5, 15])
