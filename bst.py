@@ -164,8 +164,7 @@ class BST:
             elif not cur.left:
                 return cur.right
             # If both left and right children exist in the node replace its value with
-            # the minmimum value in the right subtree. Now delete that minimum node
-            # in the right subtree
+            # the minmimum value in the right subtree. 
             parent = cur.right
             #find inorder successor
             while parent.left:
