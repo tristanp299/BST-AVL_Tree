@@ -376,35 +376,53 @@ class BST:
                 cur = cur.right
         return False
 
-    def inorder_traversal(self) -> Queue:
-        """
-        TODO: Write your implementation
-        """
-        pass
+    def inorder_traversal(self, inorder = None, cur = None) -> Queue:
+
+        if cur is None and inorder is None:
+            cur = self._root
+            inorder = Queue()
+
+        if self._root is None:
+            return inorder
+        # L N R
+        if cur.left is not None:
+            self.inorder_traversal(inorder, cur.left)
+
+        inorder.enqueue(cur.value)
+
+        if cur.right is not None:
+            self.inorder_traversal(inorder, cur.right)
+
+        return inorder
+
 
     def find_min(self) -> object:
-        """
-        TODO: Write your implementation
-        """
-        pass
+
+        if self._root is None:
+            return None
+        num = self._root
+        while(num.left is not None and num.value>num.left.value):
+            num = num.left
+        return num.value
 
     def find_max(self) -> object:
-        """
-        TODO: Write your implementation
-        """
-        pass
+
+        if self._root is None:
+            return None
+        num = self._root
+        while(num.right is not None and num.value<num.right.value):
+            num = num.right
+        return num.value
 
     def is_empty(self) -> bool:
-        """
-        TODO: Write your implementation
-        """
-        pass
+
+        if self._root is None:
+            return False
+        return True
 
     def make_empty(self) -> None:
-        """
-        TODO: Write your implementation
-        """
-        pass
+
+        self._root = None
 
 
 # ------------------- BASIC TESTING -----------------------------------------
@@ -505,7 +523,7 @@ if __name__ == '__main__':
         if not tree.is_valid_bst():
             raise Exception("PROBLEM WITH REMOVE OPERATION")
         print('RESULT :', tree)
-else:
+
     print("\nPDF - method contains() example 1")
     print("---------------------------------")
     tree = BST([10, 5, 15])
@@ -527,6 +545,7 @@ else:
     print("---------------------------------")
     tree = BST([8, 10, -4, 5, -1])
     print(tree.inorder_traversal())
+
 
     print("\nPDF - method find_min() example 1")
     print("---------------------------------")
@@ -551,7 +570,7 @@ else:
     tree = BST([8, 10, -4, 5, -1])
     print(tree)
     print("Maximum value is:", tree.find_max())
-
+else:
     print("\nPDF - method is_empty() example 1")
     print("---------------------------------")
     tree = BST([10, 20, 5, 15, 17, 7, 12])
