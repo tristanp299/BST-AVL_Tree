@@ -126,13 +126,13 @@ class BST:
         else:
             parent.right = BSTNode(value)
 
-    def find_node(self, value):
-
-        cur = self._root
-
-        while(cur is not None):
-            if cur.value == value:
-                return True
+    # def find_node(self, value):
+    #
+    #     cur = self._root
+    #
+    #     while(cur is not None):
+    #         if cur.value == value:
+    #             return True
             
 
     def remove(self, value: object) -> bool:
@@ -163,7 +163,7 @@ class BST:
             return False
         
         # handle case where node to remove is root
-        if cur == self._root:
+        if cur.value == self._root.value:
             if self._root.left is None and self._root.right is None:
                 self._root = None
                 return True
@@ -191,7 +191,7 @@ class BST:
             return True
         #if node is a leaf
         if cur.left is None and cur.right is None and left_bool:
-            parent.right = None
+            parent.left = None
             return True
         if cur.left is None and cur.right is None and not left_bool:
             parent.right = None
@@ -431,10 +431,10 @@ class BST:
         return num.value
 
     def is_empty(self) -> bool:
-        """is_empty function returns False if the BST is empty, otherwise returns True"""
+        """is_empty function returns True if the BST is empty, otherwise returns False"""
         if self._root is None:
-            return False
-        return True
+            return True
+        return False
 
     def make_empty(self) -> None:
         """make_empty functions turns the BST to None."""
@@ -587,7 +587,7 @@ if __name__ == '__main__':
     tree = BST([8, 10, -4, 5, -1])
     print(tree)
     print("Maximum value is:", tree.find_max())
-else:
+
     print("\nPDF - method is_empty() example 1")
     print("---------------------------------")
     tree = BST([10, 20, 5, 15, 17, 7, 12])
