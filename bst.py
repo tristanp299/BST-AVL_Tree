@@ -1,9 +1,9 @@
-# Name:
-# OSU Email:
+# Name: Tristan Pereira
+# OSU Email: pereirtr
 # Course: CS261 - Data Structures
-# Assignment:
-# Due Date:
-# Description:
+# Assignment: Assignment 4 BST/AVL Tree Implementation
+# Due Date: 07/26/2022
+# Description: bst.py is a script that implements a binary search tree. There are methods that help manipulate the data and nodes associated with them.
 
 
 import random
@@ -106,38 +106,44 @@ class BST:
     # ------------------------------------------------------------------ #
 
     def add(self, value: object) -> None:
+        """add function thats in a value and adds that value to the appropiate spot on the BST"""
 
         if self._root is None:
             self._root = BSTNode(value)
             return
         cur = self._root
         parent = None
+
         while (cur is not None):
             parent = cur
             if value < cur.value:
                 cur = cur.left
             else:
                 cur = cur.right
+
         if value< parent.value:
             parent.left = BSTNode(value)
         else:
             parent.right = BSTNode(value)
 
     def find_node(self, value):
-        parent = None
+
         cur = self._root
+
         while(cur is not None):
             if cur.value == value:
                 return True
             
 
     def remove(self, value: object) -> bool:
+        """remove function takes in a value and removes that value from the BST"""
 
         # iterate through tree in search of value
         left_bool = False
         node_found = False
         parent = None
         cur = self._root
+
         while cur is not None and not node_found:
             if value == cur.value:
                 node_found = True
@@ -365,8 +371,10 @@ class BST:
         pass
 
     def contains(self, value: object) -> bool:
+        """contains function takes in a value and returns True if the value is in the BST, otherwise returns False"""
 
         cur = self._root
+
         while (cur is not None):
             if value == cur.value:
                 return True
@@ -377,6 +385,7 @@ class BST:
         return False
 
     def inorder_traversal(self, inorder = None, cur = None) -> Queue:
+        """inorder_traversal traverses through the BST and returns a Qeueue with the elements in inorder positions"""
 
         if cur is None and inorder is None:
             cur = self._root
@@ -397,30 +406,38 @@ class BST:
 
 
     def find_min(self) -> object:
+        '''find_min function finds the minimum value in the BST and returns that object.'''
 
         if self._root is None:
             return None
+
         num = self._root
+
         while(num.left is not None and num.value>num.left.value):
             num = num.left
+
         return num.value
 
     def find_max(self) -> object:
+        """find_max finds the maximum value in the BST and returns that object."""
 
         if self._root is None:
             return None
+
         num = self._root
+
         while(num.right is not None and num.value<num.right.value):
             num = num.right
         return num.value
 
     def is_empty(self) -> bool:
-
+        """is_empty function returns False if the BST is empty, otherwise returns True"""
         if self._root is None:
             return False
         return True
 
     def make_empty(self) -> None:
+        """make_empty functions turns the BST to None."""
 
         self._root = None
 

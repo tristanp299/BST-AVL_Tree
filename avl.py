@@ -132,16 +132,26 @@ class AVL(BST):
     # Change these methods in any way you'd like.                   #
 
     def _balance_factor(self, node: AVLNode) -> int:
-        """
-        TODO: Write your implementation
-        """
-        pass
+        b = 0
+        if b
+
+
+
 
     def _get_height(self, node: AVLNode) -> int:
-        """
-        TODO: Write your implementation
-        """
-        pass
+
+        if self._root is None:
+            return -1
+        if node.left is None and node.right is None:
+            return 0
+        if node.left is None and node.right is not None:
+            return 1+ self._get_height(node.right)
+        if node.right is None and node.left is not None:
+            return 1+ self._get_height(node.left)
+        if self._get_height(node.left) > self._get_height(node.right):
+            return 1+self._get_height(node.left)
+        else:
+            return self._get_height(node.right)+1
 
     def _rotate_left(self, node: AVLNode) -> AVLNode:
         """
