@@ -1,9 +1,9 @@
-# Name:
-# OSU Email:
+# Name: Tristan Pereira
+# OSU Email: pereirtr
 # Course: CS261 - Data Structures
-# Assignment:
-# Due Date:
-# Description:
+# Assignment: Assignment 4 BST/AVL Tree Implementation
+# Due Date: 07/26/2022
+# Description: avl.py contains two classes AVLNode and AVL. This script implements an AVL Tree with methods to manipulate nodes inside the tree.
 
 
 import random
@@ -98,53 +98,55 @@ class AVL(BST):
         return True
 
     # ------------------------------------------------------------------ #
-    def find(self, node, value, tof=True):
-        """
-        Takes in a value and returns the node which match the value. If false it will
-        return the parent node or the node if already exists.
-        """
+    def find(self, node: AVLNode, value: object) -> AVLNode:
+        '''find function takes in a node and a value as a paremter, searches for that node and then returns it '''
+        
         if node is not None:
             if node.value > value:
                 if node.left is not None:
-                    return self.find(node.left, value, tof)
+                    return self.find(node.left, value)
                 else:
                     return node
             else:
-                if not tof and node.value == value:
+                if node.value == value:
                     return node
                 elif node.right is not None:
-                    return self.find(node.right, value, tof)
+                    return self.find(node.right, value)
                 else:
                     return node
 
     def add(self, value: object) -> None:
-        """
-        Adds a node containing value to the AVL tree, if it doesn't already exist
-        """
+        '''add function places a new AVL node into the appropriate spot in the AVL Tree'''
+        
         node = AVLNode(value)
         if self._root is None:
             self._root = node
             return
-        # from this point on we are dealing with thing with parents
-        parentNode = self.find(self._root, value, False)
 
-        if parentNode.value == value: # duplicates begone
+        parent = self.find(self._root, value)
+
+        if parent.value == value: 
             return
-        if parentNode.value > value:
-            parentNode.left = node
+        if parent.value > value:
+            parent.left = node
         else:
-            parentNode.right = node
-        node.parent = parentNode
+            parent.right = node
+            
+        node.parent = parent
         self._update_height(node)
         self._rebalance(node)
 
     def remove(self, value: object) -> bool:
-
+        '''remove function takes in a value and removes that node from AVL tree. If node is removed it returns True, otherwise returns False'''
+        
         if self._root is None:
             return False
-        node = self.find(self._root, value, False)
+        
+        node = self.find(self._root, value)
         parent = node.parent
+        #removes if node is the root
         if node == self._root:
+            #if leaf
             if node.left is None and node.right is None:
                 self._root = None
                 return True
@@ -153,25 +155,31 @@ class AVL(BST):
             elif node.right is None:
                 self._root = self._root.left
             else:
-                succ = self._root.right
-                while succ.left is not None:
-                    succ = succ.left
-                succ.left = self._root.left
-                succ.left.parent = succ
+                #if there are two subtrees.
+                inorder_succ = self._root.right
+                #finds inorder successor
+                while inorder_succ.left is not None:
+                    inorder_succ = inorder_succ.left
+                inorder_succ.left = self._root.left
+                inorder_succ.left.parent = inorder_succ
                 parent = None
-                if succ.parent is not self._root:
-                    parent = succ.parent
-                    parent.left = succ.right
+                
+                if inorder_succ.parent is not self._root:
+                    parent = inorder_succ.parent
+                    parent.left = inorder_succ.right
+
                     if parent.left is not None:
                         parent.left.parent = parent
-                    succ.right = self._root.right
-                    succ.right.parent = succ
+                    inorder_succ.right = self._root.right
+                    inorder_succ.right.parent = inorder_succ
+
                 else:
-                    succ.right = self._root.right.right
-                    if succ.right is not None:
-                        succ.right.parent = succ
-                self._root = succ
+                    inorder_succ.right = self._root.right.right
+                    if inorder_succ.right is not None:
+                        inorder_succ.right.parent = inorder_succ
+                self._root = inorder_succ
                 self._root.parent = None
+
                 if parent is not None:
                     self._update_height(parent)
                     self._rebalance(parent)
@@ -216,200 +224,246 @@ class AVL(BST):
             self._remove_two_subtrees(parent, node)
             return True
 
-    # Experiment and see if you can use the optional                         #
-    # subtree removal methods defined in the BST here in the AVL.            #
-    # Call normally using self -> self._remove_no_subtrees(parent, node)     #
-    # You need to override the _remove_two_subtrees() method in any case.    #
-    # Remove these comments.                                                 #
-    # Remove these method stubs if you decide not to use them.               #
-    # Change this method in any way you'd like.                              #
-
     def _remove_two_subtrees(self, remove_parent: AVLNode, remove_node: AVLNode) -> AVLNode:
+        '''_remove_two_subtrees removes a node if there are two subtrees as child nodes. This function only works if removed node is not root.'''
 
         parent = remove_parent
         node = remove_node
-        succ = node.right
-        while succ.left is not None:
-            succ = succ.left
-        succ.left = node.left
-        succ.left.parent = succ
-        succParent = None
-        if succ.parent is not node:
-            succParent = succ.parent
-            succ.parent.left = succ.right
-            if succParent.left is not None:
-                succParent.left.parent = succParent
-        if node.right != succ:
-            succ.right = node.right
-        else:
-            succ.right = node.right.right
-        if succ.right is not None:
-            succ.right.parent = succ
-        if parent.left == node:
-            parent.left = succ
-        else:
-            parent.right = succ
-        succ.parent = parent
-        if succParent is not None:
-            self._update_height(succParent)
-            self._rebalance(succParent)
-        else:
-            self._update_height(succ)
-            self._rebalance(succ)
-        return succ
+        inorder_succ = node.right
 
-    # It's highly recommended to implement                          #
-    # the following methods for balancing the AVL Tree.             #
-    # Remove these comments.                                        #
-    # Remove these method stubs if you decide not to use them.      #
-    # Change these methods in any way you'd like.                   #
+        #finds the successor for removed node
+        while inorder_succ.left is not None:
+            inorder_succ = inorder_succ.left
+
+        inorder_succ.left = node.left
+        inorder_succ.left.parent = inorder_succ
+        inorder_succ_parent = None
+
+        if inorder_succ.parent is not node:
+            inorder_succ_parent = inorder_succ.parent
+            inorder_succ.parent.left = inorder_succ.right
+
+            if inorder_succ_parent.left is not None:
+                inorder_succ_parent.left.parent = inorder_succ_parent
+
+        if node.right.value != inorder_succ.value:
+            inorder_succ.right = node.right
+        else:
+            inorder_succ.right = node.right.right
+
+        if inorder_succ.right is not None:
+            inorder_succ.right.parent = inorder_succ
+
+        if parent.left.value == node.value:
+            parent.left = inorder_succ
+        else:
+            parent.right = inorder_succ
+
+        inorder_succ.parent = parent
+
+        if inorder_succ_parent is not None:
+            self._update_height(inorder_succ_parent)
+            self._rebalance(inorder_succ_parent)
+
+        else:
+            self._update_height(inorder_succ)
+            self._rebalance(inorder_succ)
+
+        return inorder_succ
 
     def _balance_factor(self, node: AVLNode) -> int:
+        '''_balance_factor function takes in a node and returns the balance factor of the node.'''
 
         lheight = 0
         rheight = 0
 
         if node.right is not None:
             rheight = node.right.height
-        if lheight is not None:
+        if node.left is not None:
             lheight = node.left.height
 
         return rheight - lheight
 
     def _get_height(self, node: AVLNode) -> int:
+        '''_get_height function takes in node and returns the height of the node.'''
 
         return node.height
 
     def _rotate_left(self, node: AVLNode) -> AVLNode:
-        """
-        Takes in a node and performs a left rotation assuming that all pre-conditions
-        are met. Updates the parent for all nodes involved.
-        """
-        # you got to think of this like a linked list
+        '''_rotate_left functions takes in a node and rotates it left along the AVL tree structure and returns the node with updated parents and child nodes.'''
+
         parent = None
 
         if node.parent is not None:
             parent = node.parent
 
-        rightNode = node.right
-        node.right = rightNode.left
+        node_right = node.right
+        node.right = node_right.left
 
         if node.right is not None:
             node.right.parent = node
 
-        rightNode.left = node
+        node_right.left = node
 
         if parent is None:
-            self._root = rightNode
+            
+            self._root = node_right
             self._root.parent = None
 
         else:
-            rightNode.parent = parent
-            if parent.right == node:
-                parent.right = rightNode
-            else:
-                parent.left = rightNode
+            node_right.parent = parent
 
-        node.parent = rightNode
+            if parent.right == node:
+                parent.right = node_right
+            else:
+                parent.left = node_right
+
+        node.parent = node_right
         self._update_height(node)
         return node
 
     def _rotate_right(self, node: AVLNode) -> AVLNode:
-
+        '''_rotate_right functions takes in a node as a parameter and rotates it right along the AVL tree. It returns the node with updated parents and children'''
         parent = None
+        
         if node.parent is not None:
             parent = node.parent
-        leftNode = node.left
-        node.left = leftNode.right
+            
+        node_left = node.left
+        node.left = node_left.right
+        
         if node.left is not None:
             node.left.parent = node
-        leftNode.right = node
+            
+        node_left.right = node
+        
         if parent is None:
-            self._root = leftNode
+            self._root = node_left
             self._root.parent = None
         else:
-            leftNode.parent = parent
+            node_left.parent = parent
             if parent.right == node:
-                parent.right = leftNode
+                parent.right = node_left
             else:
-                parent.left = leftNode
-        node.parent = leftNode
+                parent.left = node_left
+                
+        node.parent = node_left
         self._update_height(node)
         return node
 
 
 
     def _update_height(self, node: AVLNode) -> None:
-
+        '''update_height function takes in a node as a parameter and updates the height information of that node after a AVL tree operation.'''
+        #double subtrees
         if node.left is not None and node.right is not None:
             if node.left.height > node.right.height:
                 node.height = node.left.height + 1
             else:
                 node.height = node.right.height + 1
+        #leaf
         elif node.left is None and node.right is None:
             node.height = 0
+        #no left subtree
         elif node.left is None:
             node.height = node.right.height + 1
+        #no right subtree
         elif node.right is None:
             node.height = node.left.height + 1
-
+        
+        #traces up the tree and updates
         while node.parent is not None:
-            # parents are at least of height one
+
             parent = node.parent
-            left, right = parent.left, parent.right
+            #double subtrees
             if parent.left is not None and parent.right is not None:
                 if parent.left.height > parent.right.height:
                     parent.height = parent.left.height + 1
                 else:
                     parent.height = parent.right.height + 1
+            #no right subtree
             elif parent.right is None:
                 parent.height = parent.left.height + 1
+            #no left subtree
             else:
                 parent.height = parent.right.height + 1
+                
             node = node.parent
 
     def _rebalance(self, node: AVLNode) -> None:
-        """
-                Takes in a node and rebalances the node starting from that node and all parents involved
-                Everything below that node is assumed to already be balanced.
-                """
-        # we are starting from the node we just added in, so everything below 
-        # that is already balanced, so we don't need to worry, so we really 
-        # should care about the case where node.left and node.right are both not
-        # None
+        '''_rebalance function takes a node and checks for unbalanaced subtrees, the function will then do a single or double rotation based off the balance.'''
+
         if node is not None:
+            #rebalance if two subtrees
+            node_balance = self._balance_factor(node)
+
+
+            # if node_balance < -1:
+            #     node_left_balance_factor = self._balance_factor(node.left)
+            #
+            #     if node_left_balance_factor < 0:
+            #         self._rotate_right(node)
+            #
+            #     elif node_left_balance_factor > 0:
+            #
+            #
+            #         self._rotate_left(node.left)
+            #         self._rotate_right(node)
+            #
+            # elif node_balance > 1:
+            #
+            #     node_right_balance_factor = self._balance_factor(node.right)
+            #
+            #     if node_right_balance_factor < 0:
+            #
+            #         self._rotate_right(node.right)
+            #         self._rotate_left(node)
+            #
+            #     elif node_right_balance_factor > 0:
+            #
+            #         self._rotate_left(node)
+
+
+
             if node.left is not None and node.right is not None:
-                height = node.right.height - node.left.height
-                if height == 2:  # right heavy, now need to check if it is right right or right left
-                    if node.right.left is None or (
-                            node.right.right is not None and node.right.left.height <= node.right.right.height):
+                node_balance = self._balance_factor(node)
+                #right heavy
+                if node_balance == 2:
+                    #L - Single Rotate
+                    if node.right.left is None or (node.right.right is not None and node.right.left.height <= node.right.right.height):
                         self._rotate_left(node)
-                    else:  # right left 
-                        self._rotate_right(node.right)  # this extra step is required to make it right right heavy
+                    #RL - Double Rotate
+                    else:
+                        self._rotate_right(node.right)
                         self._rotate_left(node)
-                elif height == -2:  # left heavy, now need to check if it is left left or left right
-                    if node.left.right is None or (
-                            node.left.left is not None or node.left.left.height >= node.left.right.height):
+                #left heavy
+                elif node_balance == -2:  # left heavy, now need to check if it is left left or left right
+                    #L - Single Rotate
+                    if node.left.right is None or (node.left.left is not None or node.left.left.height >= node.left.right.height):
                         self._rotate_right(node)
-                    else:  # left right, rotate left first then right 
-                        self._rotate_left(node.left)  # this extra step is required to make it left left heavy
+                    #LR - Double Rotate
+                    else:
+                        self._rotate_left(node.left)
                         self._rotate_right(node)
+            #one subtree
             elif node.right is None and node.height == 2:
-                # we need to make sure that it is left left 
-                if node.left.right is None or (
-                        node.left.left is not None and node.left.left.height >= node.left.right.height):
+                #R - One rotation
+                if node.left.right is None or (node.left.left is not None and node.left.left.height >= node.left.right.height):
                     self._rotate_right(node)
+                #LR - Doubel Rotation
                 else:
-                    self._rotate_left(node.left)  # this extra step is required to make it left left heavy
+                    self._rotate_left(node.left)
                     self._rotate_right(node)
+
             elif node.left is None and node.height == 2:
-                # we need to make sure that it is right right 
-                if node.right.left is None or (
-                        node.right.right is not None and node.right.right.height >= node.right.left.height):
+                #L - One Rotation
+                if node.right.left is None or (node.right.right is not None and node.right.right.height >= node.right.left.height):
                     self._rotate_left(node)
+                #RL - Double Rotation
                 else:
-                    self._rotate_right(node.right)  # this extra step is required to make it right right heavy
+                    self._rotate_right(node.right)
                     self._rotate_left(node)
+
             self._rebalance(node.parent)
 
 
