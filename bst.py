@@ -171,25 +171,29 @@ class BST:
             if self._root.right is None:
                 self._root = self._root.left
                 return True
-            #has right subtree
-            cur = self._root.right
-            parent = self._root
-            left_bool = False
-            #find successor
-            while (cur.left is not None):
-                parent = cur
-                cur = cur.left
-                left_bool = True
-            if left_bool:
-                parent.left = cur.right
+            if self._root.left is None:
+                self._root = self._root.right
+                return True
             else:
-                parent.right = cur.right
-            #replace leftmost child into root
-            cur.left = self._root.left
-            cur.right = self._root.right
-            self._root = cur
-            return True
-        #if node is a leaf
+
+                cur = self._root.right
+                parent = self._root
+                left_bool = False
+                #find successor
+                while (cur.left is not None):
+                    parent = cur
+                    cur = cur.left
+                    left_bool = True
+                if left_bool:
+                    parent.left = cur.right
+                else:
+                    parent.right = cur.right
+                #replace leftmost child into root
+                cur.left = self._root.left
+                cur.right = self._root.right
+                self._root = cur
+                return True
+            #if node is a leaf
         if cur.left is None and cur.right is None and left_bool:
             parent.left = None
             return True
@@ -233,7 +237,7 @@ class BST:
 
 
         # Please ignore commented below, many different methods both recursive and iterative,
-        # tried and failed. They are the scars I wear proudly. In hindsight, I should've used those helper functions.
+        # tried and failed. They are the scars I wear. In hindsight, I should've used those helper functions.
 
         #
         # # handle case where cur is a leaf

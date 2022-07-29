@@ -141,9 +141,11 @@ class AVL(BST):
         
         if self._root is None:
             return False
-        
+        if not self.contains(value):
+            return False
         node = self.find(self._root, value)
         parent = node.parent
+
         #removes if node is the root
         if node == self._root:
             #if leaf
@@ -423,48 +425,91 @@ class AVL(BST):
             #
             #         self._rotate_left(node)
 
-
-
             if node.left is not None and node.right is not None:
                 node_balance = self._balance_factor(node)
-                #right heavy
+                # right heavy
                 if node_balance == 2:
-                    #L - Single Rotate
-                    if node.right.left is None or (node.right.right is not None and node.right.left.height <= node.right.right.height):
+                    # L - Single Rotate
+                    r_node_balance = self._balance_factor(node.right)
+                    if node.right.left is None or (node.right.right is not None and r_node_balance >= 0):
                         self._rotate_left(node)
-                    #RL - Double Rotate
+                    # RL - Double Rotate
                     else:
                         self._rotate_right(node.right)
                         self._rotate_left(node)
-                #left heavy
-                elif node_balance == -2:  # left heavy, now need to check if it is left left or left right
-                    #L - Single Rotate
-                    if node.left.right is None or (node.left.left is not None or node.left.left.height >= node.left.right.height):
+                # left heavy
+                elif node_balance == -2:
+                    # L - Single Rotate
+                    l_node_balance = self._balance_factor(node.left)
+                    if node.left.right is None or (node.left.left is not None or l_node_balance <= 0):
                         self._rotate_right(node)
-                    #LR - Double Rotate
+                    # LR - Double Rotate
                     else:
                         self._rotate_left(node.left)
                         self._rotate_right(node)
-            #one subtree
+                # one subtree
             elif node.right is None and node.height == 2:
-                #R - One rotation
-                if node.left.right is None or (node.left.left is not None and node.left.left.height >= node.left.right.height):
+                # R - One rotation
+                l_node_balance = self._balance_factor(node.left)
+                if node.left.right is None or (node.left.left is not None and l_node_balance <= 0):
                     self._rotate_right(node)
-                #LR - Doubel Rotation
+                # LR - Doubel Rotation
                 else:
                     self._rotate_left(node.left)
                     self._rotate_right(node)
 
             elif node.left is None and node.height == 2:
-                #L - One Rotation
-                if node.right.left is None or (node.right.right is not None and node.right.right.height >= node.right.left.height):
+                # L - One Rotation
+                r_node_balance = self._balance_factor(node.right)
+                if node.right.left is None or (node.right.right is not None and r_node_balance >= 0):
                     self._rotate_left(node)
-                #RL - Double Rotation
+                # RL - Double Rotation
                 else:
                     self._rotate_right(node.right)
                     self._rotate_left(node)
 
             self._rebalance(node.parent)
+
+            # if node.left is not None and node.right is not None:
+            #     node_balance = self._balance_factor(node)
+            #     #right heavy
+            #     if node_balance == 2:
+            #         #L - Single Rotate
+            #         if node.right.left is None:
+            #             self._rotate_left(node)
+            #         #RL - Double Rotate
+            #         else:
+            #             self._rotate_right(node.right)
+            #             self._rotate_left(node)
+            #     #left heavy
+            #     elif node_balance == -2:
+            #         #L - Single Rotate
+            #         if node.left.right is None:
+            #             self._rotate_right(node)
+            #         #LR - Double Rotate
+            #         else:
+            #             self._rotate_left(node.left)
+            #             self._rotate_right(node)
+            # #one subtree
+            # elif node.right is None and node.height == 2:
+            #     #R - One rotation
+            #     if node.left.right is None:
+            #         self._rotate_right(node)
+            #     #LR - Doubel Rotation
+            #     else:
+            #         self._rotate_left(node.left)
+            #         self._rotate_right(node)
+            #
+            # elif node.left is None and node.height == 2:
+            #     #L - One Rotation
+            #     if node.right.left is None
+            #         self._rotate_left(node)
+            #     #RL - Double Rotation
+            #     else:
+            #         self._rotate_right(node.right)
+            #         self._rotate_left(node)
+            #
+            # self._rebalance(node.parent)
 
 
         # ------------------- BASIC TESTING -----------------------------------------
