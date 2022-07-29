@@ -156,7 +156,7 @@ class AVL(BST):
                 self._root = self._root.right
             elif node.right is None:
                 self._root = self._root.left
-            else:
+            else:#
                 #if there are two subtrees.
                 inorder_succ = self._root.right
                 #finds inorder successor

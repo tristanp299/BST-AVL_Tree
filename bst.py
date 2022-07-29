@@ -175,7 +175,7 @@ class BST:
                 self._root = self._root.right
                 return True
             else:
-
+#d
                 cur = self._root.right
                 parent = self._root
                 left_bool = False
